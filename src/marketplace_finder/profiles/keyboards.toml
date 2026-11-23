@@ -1,0 +1,130 @@
+# Vintage and mechanical computer keyboards.
+#
+# This file is also the reference for writing a profile of your own. Copy it next
+# to your config.toml, change it, and point config.toml at the copy:
+#
+#     [profile]
+#     path = "my-search.toml"
+#
+# `marketplace-finder doctor` reports any mistake in the file. Only `item` and
+# `queries` are required.
+
+# Starts the title of the private alerts sent when something breaks.
+label = "Keyboard finder"
+
+# What is being looked for, in a few words. Claude answers "is this listing selling this?"
+item = "a vintage or mechanical computer keyboard"
+
+# Who it is for. Finishes the sentence "You are screening a listing for ...".
+audience = "a retro computing group whose members collect, restore and type on old keyboards"
+
+# What they want, one point each. Local pickup within the radius in config.toml is added for you.
+wanted = [
+    "any complete computer keyboard with mechanical switches from the 1980s or 1990s: IBM Model F and Model M, Apple Extended, Northgate OmniKey, Dell AT101, early Cherry boards and terminal keyboards",
+    "newer boards built the same way, such as Unicomp or Topre",
+    "working, untested or just dirty; a board that does not work is still worth restoring",
+]
+
+# Finishes the sentence "They are not interested in ...".
+not_wanted = "musical keyboards, modern membrane or rubber-dome office keyboards, gaming keyboards, laptop and tablet keyboards, loose keycaps, and keyboard trays, stands and covers"
+
+# Optional extra guidance for describing a listing.
+notes = "Use what you know about model and part numbers to settle the switch type and connector: an IBM part number such as 1391401, for example, identifies a Model M."
+
+# Finishes the sentence "Read each photo before answering: ...".
+photo_hint = "the label on the underside usually gives the maker, the model or part number and the date, and the plug shows the connector."
+
+# What "best value" means for the top picks in the opening post, one point each.
+ranking = [
+    "the switches for the price: beam spring and Model F boards are the rarest, then buckling spring and Alps; what similar boards usually sell for",
+    "completeness: all keycaps present and the original cable included",
+    "condition: confirmed working beats untested, and clean beats yellowed or corroded",
+]
+
+# Searches run on every source.
+queries = ["model m keyboard", "vintage keyboard", "mechanical keyboard", "ibm keyboard"]
+
+# By default a listing described as not working is rejected. Old keyboards are
+# usually repairable, so here they are kept and the post says "Not working".
+allow_not_working = true
+
+# The colour of a post that earned a badge. Posts without one are grey.
+colour = "#2EC4B6"
+
+# Posted once, before the top picks. Leave it out for a standard message.
+# welcome = "**Keyboard hunting is live.** ..."
+
+# To run different searches on one source, add a table like this one. It has to come
+# after all the settings above, as every [table] does in TOML.
+#     [source_queries]
+#     ebay = ["ibm model m", "model f keyboard"]
+
+# Keywords are checked in code before Claude sees a listing, so that unrelated
+# search results cost nothing. Whole words and phrases, any case.
+[keywords]
+# Any one of these, in the title or the description, is enough on every source.
+include = [
+    "model m", "model f", "buckling spring", "beam spring", "alps", "ibm keyboard",
+    "apple extended keyboard", "omnikey", "northgate", "at101", "unicomp", "topre",
+    "mechanical keyboard", "terminal keyboard", "clicky",
+]
+# These are enough only on sources whose search is precise (craigslist, OfferUp, eBay).
+# Facebook returns anything loosely related, so there a word from `include` is needed.
+loose = ["keyboard", "keyboards", "teclado"]
+# A title with one of these is dropped, unless a word from `include` saved it first.
+exclude_title = [
+    "piano", "synth", "synthesizer", "midi", "yamaha", "casio", "roland", "korg",
+    "stand", "tray", "drawer", "cover", "ipad", "tablet", "laptop", "bluetooth",
+    "wireless", "gaming",
+]
+
+# Fields are what Claude fills in for each listing, on top of the built-in ones
+# (is_wanted_item, brand, model, working, local_pickup_plausible, summary, concerns).
+#
+#   type         "enum" (one of `values`), "boolean", "number" or "string"
+#   description  tells Claude what the field means; worth writing carefully
+#   label        show the answer in the post under this heading (answers of
+#                "unknown" are left out)
+#   display      nicer wording for an answer in the post
+#   reject       answers that rule a listing out (enum and boolean fields)
+#   badges       answers that earn flair at the top of the post
+#
+# Claude only describes the listing. Whether it is posted is decided by these rules.
+
+[[fields]]
+name = "switch_type"
+type = "enum"
+values = ["buckling_spring", "beam_spring", "alps", "cherry_mx", "topre", "other_mechanical", "rubber_dome", "unknown"]
+description = "The key switches. 'buckling_spring' covers IBM Model F and Model M and Unicomp; 'alps' includes Alps clones; 'rubber_dome' is any membrane or dome board without mechanical switches. 'unknown' unless the listing, the photos or the model settle it."
+label = "Switches"
+display = { buckling_spring = "Buckling spring", beam_spring = "Beam spring", alps = "Alps", cherry_mx = "Cherry MX", topre = "Topre", other_mechanical = "Mechanical, type not known" }
+reject = ["rubber_dome"]
+badges = { buckling_spring = "⭐ Buckling spring", beam_spring = "💎 Beam spring", alps = "🏔️ Alps", topre = "☁️ Topre" }
+
+[[fields]]
+name = "connector"
+type = "enum"
+values = ["usb", "ps2", "at_din", "xt_din", "adb", "terminal", "other", "unknown"]
+description = "The plug on the keyboard's cable. 'at_din' and 'xt_din' are the large 5-pin DIN plugs of AT and XT machines; 'adb' is Apple Desktop Bus; 'terminal' is any terminal or proprietary plug that needs a converter to use with a modern computer."
+label = "Connector"
+display = { usb = "USB", ps2 = "PS/2", at_din = "AT (5-pin DIN)", xt_din = "XT (5-pin DIN)", adb = "ADB", terminal = "Terminal (needs a converter)", other = "Other" }
+
+[[fields]]
+name = "layout"
+type = "string"
+description = "The layout in a few words, such as '101-key ANSI', '84-key AT' or '122-key terminal'. Null when it cannot be told."
+label = "Layout"
+
+[[fields]]
+name = "keycaps_complete"
+type = "enum"
+values = ["yes", "no", "unknown"]
+description = "'yes' only when the photos show every key in place; 'no' when keys are visibly missing or the listing says so."
+label = "Keycaps"
+display = { yes = "All present", no = "Some missing" }
+
+[[fields]]
+name = "includes_cable"
+type = "boolean"
+description = "True when the cable is attached or included. Many of these keyboards have a detachable cable that is hard to replace."
+badges = { false = "🔌 No cable" }

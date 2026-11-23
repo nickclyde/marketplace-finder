@@ -1,0 +1,52 @@
+# What to look for. `name` picks a profile that ships with the project (crt, keyboards).
+# To look for something else, copy src/marketplace_finder/profiles/keyboards.toml
+# next to this file, edit it, and use:  path = "my-search.toml"
+[profile]
+name = "crt"
+
+[search]
+postal_code = "95814"
+latitude = 38.5816
+longitude = -121.4944
+radius_miles = 60
+area = "Sacramento"  # what posts call the point distances are measured from
+max_price = 500            # dollars; listings must be priced below this
+quiet_hours = [0, 5]       # no runs from 00:00 up to 05:00
+timezone = "America/Los_Angeles"
+
+[evaluator]
+model = "opus"             # "opus" or "sonnet" (the CLI's aliases for the latest of each); other families are refused
+max_per_run = 30           # new listings sent to Claude per run; the rest wait for the next run
+max_photos = 4
+
+[reference]
+crtdatabase = true         # crt profile only: look models up on crtdatabase.com
+
+[notify]
+server = "https://ntfy.sh" # private alerts only (a source failing, Facebook logged out); listings go to Discord
+
+[discord]
+enabled = true
+via = "webhook"            # "webhook" posts to DISCORD_WEBHOOK_URL from .env; "discli" posts as a bot to `channel`
+channel = ""               # discli only: the channel's name
+max_posts_per_run = 10     # listings posted per run; the rest wait for the next run
+top_picks = 10             # best-value listings in the opening post
+# welcome = "..."          # posted once, ahead of the top picks; leave out to use the profile's own
+
+# Each source runs the profile's searches. To run others on one source, add
+# queries = ["...", "..."] to its section.
+
+[sources.craigslist]
+enabled = true
+
+[sources.offerup]
+enabled = true
+
+[sources.ebay]
+enabled = true             # skipped automatically until EBAY_CLIENT_ID/SECRET are set in .env
+
+[sources.facebook]
+enabled = false            # turn on after `marketplace-finder fb-login`
+location = ""              # the slug or numeric id in facebook.com/marketplace/<location>/
+days_since_listed = 7
+max_detail_pages = 6       # listing pages opened per run
